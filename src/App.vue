@@ -6,10 +6,22 @@
 </template>
 
 <script>
+	import {mapActions} from 'vuex'
 	import FooterGuide from './components/FooterGuide/FooterGuide.vue'
 	export default {
         components:{
         	FooterGuide
+        },
+        methods:{
+        	...mapActions(['getAddress','getUserInfo'])
+        },
+        mounted(){
+        	//所有的初始化请求都可以放在App中
+        	//this.$store.dispatch('getAddress'); 
+        	//初始化请求地址信息
+        	this.getAddress();
+        	//初始化用户信息
+        	this.getUserInfo();
         }
 	}
 </script>

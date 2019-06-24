@@ -1,122 +1,32 @@
 <template>
 	<div class="miste">
 		<!--首页头部-->
-		<HeaderTop title="昌平区北七家宏福科技园(337省道北)">
-			<router-link to="/search" slot="search" class="header_search" @click="goto('/search')">
+		<HeaderTop :title="address.name">
+			<router-link to="/search" slot="search" class="header_search">
 				<i class="iconfont icon-sousuo"></i>
 			</router-link>
-			<router-link to="/login" slot="login" class="header_login">
-				<span class="header_login_text">登录 | 注册</span>
+			<router-link :to="userInfo._id?'/userInfo':'/login'" slot="login" class="header_login">
+				<span class="header_login_text" v-if="userInfo._id"><i class="iconfont icon-person"></i></span>
+				<span class="header_login_text" v-else>登录 | 注册</span>
 			</router-link>
 		</HeaderTop>
 		<!--首页导航-->
 		<nav class="miste_nav border-1px">
-			<div class="swiper-container">
+			<div class="swiper-container" v-if="categorysArr.length>0">
 				<div class="swiper-wrapper">
-					<div class="swiper-slide">
-						<a href="javascript:;" class="link_to_food">
+					<div class="swiper-slide" v-for="(categorys,index1) in categorysArr" :key="index1">
+						<a href="javascript:;" class="link_to_food" v-for="(category,index2) in categorys" :key="index2">
 							<div class="food_container">
-							    <img src="./images/nav/1.jpg" />
+							    <img v-lazy="imgBaseUrl+category.image_url" />
 							</div>
-							<span>甜品饮品</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/2.jpg" />
-							</div>
-							<span>商超便利</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/3.jpg" />
-							</div>
-							<span>美食</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/4.jpg" />
-							</div>
-							<span>简餐</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/5.jpg" />
-							</div>
-							<span>新店特惠</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/6.jpg" />
-							</div>
-							<span>准时达</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/7.jpg" />
-							</div>
-							<span>预订早餐</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/8.jpg" />
-							</div>
-							<span>土豪推荐</span>
-						</a>
-					</div>
-					<div class="swiper-slide">
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/9.jpg" />
-							</div>
-							<span>甜品饮品</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/10.jpg" />
-							</div>
-							<span>商超便利</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/11.jpg" />
-							</div>
-							<span>美食</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/12.jpg" />
-							</div>
-							<span>简餐</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/13.jpg" />
-							</div>
-							<span>新店特惠</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/14.jpg" />
-							</div>
-							<span>准时达</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/1.jpg" />
-							</div>
-							<span>预订早餐</span>
-						</a>
-						<a href="javascript:;" class="link_to_food">
-							<div class="food_container">
-							    <img src="./images/nav/2.jpg" />
-							</div>
-							<span>土豪推荐</span>
+							<span>{{category.title}}</span>
 						</a>
 					</div>
 				</div>
 				<!-- Add Pagination -->
                 <div class="swiper-pagination"></div>
 			</div>
+			<img src="./images/msite_back.svg" alt="" v-else />
 		</nav>
 		<!--首页附近商家-->
 		<div class="msite_shop_list border-1px">
@@ -134,24 +44,52 @@
 	import 'swiper/dist/css/swiper.min.css'//node_modules文件夹下的swiper/dist/css/swiper.min.css
 	import HeaderTop from '../../components/HeaderTop/HeaderTop.vue'
 	import ShopList from '../../components/ShopList/ShopList.vue'
+	import {mapState} from 'vuex'
 	
 	export default {
 		components:{
 			HeaderTop,
 			ShopList
 		},
+		data(){
+			return {
+				imgBaseUrl: 'https://fuss10.elemecdn.com'
+			}
+		},
+		computed:{
+			...mapState(['address','categorys','userInfo']),
+			categorysArr() {
+				let arr = [];
+				let len = this.categorys.length;
+				let j = (len % 8) === 0 ? len / 8 : (len / 8) + 1;
+				for(let i = 0; i < j; i++) {
+					let start = i * 8;
+					let end = start + 8;
+					arr[i]=this.categorys.slice(start, end);
+				}
+				return arr;
+			}
+		},
+		watch: {
+            categorys(value) {
+                this.$nextTick(() => {
+                    new Swiper('.swiper-container', {
+                        pagination: {
+                            el: '.swiper-pagination',
+                        },
+                        loop: true
+                    })
+                })
+            }
+        },
 		mounted(){
-			new Swiper('.swiper-container',{
-				pagination: {
-                    el: '.swiper-pagination',
-                },
-                loop: true
-			});
+			//请求食品分类列表
+			this.$store.dispatch('getCategorys');
+			//根据经纬度获取商铺列表
+			this.$store.dispatch('getShops');
 		},
         methods:{
-        	goto(path){
-        		this.$router.replace(path)
-        	}
+        	
         }
 	}
 </script>
